@@ -109,15 +109,9 @@
   .recon .tag{position:absolute;top:12px;left:12px;background:rgba(5,5,5,.88);color:var(--teal);font-size:11px;letter-spacing:.16em;padding:6px 10px;font-weight:700}
   .recon .cap{position:absolute;bottom:0;left:0;right:0;background:rgba(5,5,5,.88);color:var(--gray);font-size:12.5px;padding:10px 14px}
   .recon .cap b{color:var(--amber)}
-  .tracker{position:absolute;width:110px;height:84px;border:2px dashed var(--red);pointer-events:none;animation:trackpath 10.9s ease-in-out infinite}
+  .tracker{position:absolute;width:96px;height:74px;border:2px dashed var(--red);pointer-events:none;
+    left:50%;top:42%;transform:translate(-50%,-50%);transition:opacity .3s}
   .tracker::after{content:"UAV · 3D TRACKED";position:absolute;top:-20px;left:-2px;color:var(--red);font-size:11px;letter-spacing:1.5px;font-weight:700;white-space:nowrap}
-  @keyframes trackpath{
-    0%{left:47%;top:36%}
-    22%{left:42%;top:47%}
-    45%{left:39%;top:42%}
-    70%{left:36%;top:37%}
-    100%{left:47%;top:36%}
-  }
   .recon .print-alt{width:100%;object-fit:cover}
 
   /* placeholder box (media pending) */
@@ -199,6 +193,7 @@
     .cards,.steps{gap:4mm}
     #battle .wrap{grid-template-columns:1.55fr 1fr;gap:6mm}
     .proof{page-break-inside:avoid}
+    .tracker{display:none}
     .cityshot img{animation:none;transform:none;position:static}
     .cityshot{aspect-ratio:auto}
     .det,.det-label{animation:none;opacity:1}
@@ -560,6 +555,25 @@
 
 /* ---------- restyle placeholder loops: slower + tinted (see CSS) ---------- */
 document.querySelectorAll('video.tint-amber, video.tint-teal').forEach(v=>{v.playbackRate=0.7});
+
+/* ---------- recon-world tracker: follows the tracked flyer, synced to video time ---------- */
+(function(){
+  const rec=document.querySelector('.recon video'), trk=document.querySelector('.tracker');
+  if(!rec||!trk) return;
+  // waypoints: [time s, x %, y %] of the lead flyer (box center)
+  const wp=[[0,50,42],[1,46,52],[2,52,63],[3,49,72],[4,32,87],[5,30,88],
+            [6,27,87],[7,21,93],[8,13,89],[9,20,94],[10,22,95],[10.93,24,96]];
+  function step(){
+    const t=rec.currentTime||0;
+    let i=0; while(i<wp.length-2 && wp[i+1][0]<=t) i++;
+    const a=wp[i], b=wp[i+1], f=Math.min(1,Math.max(0,(t-a[0])/(b[0]-a[0])));
+    trk.style.left=(a[1]+(b[1]-a[1])*f)+'%';
+    trk.style.top =(a[2]+(b[2]-a[2])*f)+'%';
+    trk.style.opacity = t>10.4 ? 0 : 1;   // hide over loop cut, re-acquire
+    requestAnimationFrame(step);
+  }
+  rec.addEventListener('playing',()=>requestAnimationFrame(step),{once:true});
+})();
 
 /* ---------- reveal on scroll ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.15});
