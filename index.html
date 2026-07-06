@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swarm.ai — THE battlefield intelligence · for Darkstar</title>
+<title>Swarm.ai — Distributed Perception for Defence · for Darkstar</title>
 <style>
   :root{
     --bg:#050505; --panel:#111111; --line:#2a2a2a;
@@ -217,7 +217,7 @@
   <canvas id="terrain"></canvas>
   <div class="hero-inner">
     <h1>Every threat.<br>Seen in 3D.<br><span class="dim">Live.</span></h1>
-    <div class="claim">THE battlefield intelligence_</div>
+    <div class="claim">Distributed Perception for Defence_</div>
     <p class="hero-sub">Swarm.ai turns meshes of small, thinking optical sensors into one live 3D picture
       of the battlespace — for every operator, every effector, on kilobits of bandwidth.</p>
   </div>
@@ -561,8 +561,7 @@ document.querySelectorAll('video.tint-amber, video.tint-teal').forEach(v=>{v.pla
   const rec=document.querySelector('.recon video'), trk=document.querySelector('.tracker');
   if(!rec||!trk) return;
   // waypoints: [time s, x %, y %] of the lead flyer (box center)
-  const wp=[[0,50,42],[1,46,52],[2,52,63],[3,49,72],[4,32,87],[5,30,88],
-            [6,27,87],[7,21,93],[8,13,89],[9,20,94],[10,22,95],[10.93,24,96]];
+  const wp=[[0.0, 34.1, 48.2], [0.2, 34.1, 48.2], [0.4, 34.1, 48.2], [0.6, 34.4, 48.2], [0.8, 34.5, 55.7], [1.0, 34.6, 59.3], [1.2, 34.6, 61.0], [1.4, 35.5, 63.7], [1.6, 35.9, 69.8], [1.8, 33.4, 78.6], [2.0, 32.3, 82.6], [2.2, 31.8, 88.6], [2.4, 31.8, 92.3], [2.6, 31.7, 95.0], [2.8, 31.7, 95.0], [3.0, 31.9, 95.0], [3.2, 31.9, 95.0], [3.4, 29.6, 95.0], [3.6, 28.4, 95.0], [3.8, 27.4, 94.8], [4.0, 26.9, 95.0], [4.2, 26.8, 94.4], [4.4, 26.5, 94.8], [4.6, 25.5, 95.0], [4.8, 24.8, 95.0], [5.0, 24.7, 95.0], [5.2, 24.3, 95.0], [5.4, 24.9, 95.0], [5.6, 23.8, 95.0], [5.8, 23.3, 95.0], [6.0, 23.1, 92.7], [6.2, 23.1, 91.4], [6.4, 23.1, 92.2], [6.6, 22.7, 93.6], [6.8, 22.1, 95.0], [7.0, 21.8, 95.0], [7.2, 28.3, 95.0], [7.4, 31.7, 95.0], [7.6, 35.2, 95.0], [7.8, 36.8, 95.0], [8.0, 28.7, 95.0], [8.2, 24.6, 95.0], [8.4, 22.3, 95.0], [8.6, 21.7, 95.0], [8.8, 25.1, 95.0], [9.0, 26.6, 93.3], [9.2, 29.0, 91.2], [9.4, 27.4, 88.4], [9.6, 26.7, 87.1], [9.8, 24.4, 89.5], [10.0, 21.0, 94.2], [10.2, 19.0, 95.0], [10.4, 18.0, 95.0], [10.6, 17.6, 95.0], [10.8, 17.4, 95.0]];
   function step(){
     const t=rec.currentTime||0;
     let i=0; while(i<wp.length-2 && wp[i+1][0]<=t) i++;
