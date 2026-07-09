@@ -314,7 +314,7 @@
     <div class="card rv">
       <div class="num">03</div>
       <div class="media">
-        <video src="assets/pose-demo.mp4" autoplay muted loop playsinline></video>
+        <video src="assets/pose-demo.mp4" autoplay muted loop playsinline preload="auto" data-autoplay></video>
         <img class="print-alt" src="assets/pose-demo.jpg" alt="">
         <div class="ph-tag" style="color:#00A5AB;border-color:#00A5AB">LIVE_ REAL OUTPUT</div>
       </div>
@@ -619,6 +619,18 @@
 
 /* ---------- restyle placeholder loops: slower + tinted (see CSS) ---------- */
 document.querySelectorAll('video.tint-amber, video.tint-teal').forEach(v=>{v.playbackRate=0.7});
+
+/* ---------- reliable muted autoplay for inline demo videos ---------- */
+function startAutoplayVideos(){
+  document.querySelectorAll('video[data-autoplay]').forEach(v=>{
+    v.muted=true;
+    v.playsInline=true;
+    const play=v.play();
+    if(play&&typeof play.catch==='function') play.catch(()=>{});
+  });
+}
+window.addEventListener('load',startAutoplayVideos);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden) startAutoplayVideos()});
 
 /* ---------- reveal on scroll ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.15});
