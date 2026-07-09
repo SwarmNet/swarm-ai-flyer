@@ -103,15 +103,13 @@
   .pop.d3{animation-delay:1.8s}
   @keyframes pop{0%,6%{transform:scale(0)}14%,86%{transform:scale(1)}94%,100%{transform:scale(0)}}
 
-  /* ---------- reconstructed world (real recon video) ---------- */
+  /* ---------- reconstructed world ---------- */
   .recon{position:relative;margin-top:14px;border:1px solid var(--line);background:#f2f2ee;display:flex;justify-content:center;overflow:hidden}
   .recon video{height:480px;display:block}
+  .recon-soon{height:480px;width:100%;display:flex;align-items:center;justify-content:center;background:#080808;color:var(--teal);font-weight:800;font-size:clamp(30px,5vw,68px);letter-spacing:.12em;text-transform:uppercase}
   .recon .tag{position:absolute;top:12px;left:12px;background:rgba(5,5,5,.88);color:var(--teal);font-size:11px;letter-spacing:.16em;padding:6px 10px;font-weight:700}
   .recon .cap{position:absolute;bottom:0;left:0;right:0;background:rgba(5,5,5,.88);color:var(--gray);font-size:12.5px;padding:10px 14px}
   .recon .cap b{color:var(--amber)}
-  .tracker{position:absolute;width:96px;height:74px;border:2px dashed var(--red);pointer-events:none;
-    left:50%;top:42%;transform:translate(-50%,-50%);transition:opacity .3s}
-  .tracker::after{content:"UAV · 3D TRACKED";position:absolute;top:-20px;left:-2px;color:var(--red);font-size:11px;letter-spacing:1.5px;font-weight:700;white-space:nowrap}
   .recon .print-alt{width:100%;object-fit:cover}
 
   /* placeholder box (media pending) */
@@ -209,12 +207,12 @@
     .stat b{font-size:14pt}
     video{display:none !important}
     .print-alt{display:block}
+    .recon .print-alt{display:none}
     .card{min-height:0}
     .card .media{height:34mm}
     .cards,.steps{gap:4mm}
     #battle .wrap{grid-template-columns:1.55fr 1fr;gap:6mm}
     .proof{page-break-inside:avoid}
-    .tracker{display:none}
     .cityshot img{animation:none;transform:none;position:static}
     .cityshot{aspect-ratio:auto}
     .det,.det-label{animation:none;opacity:1}
@@ -263,7 +261,8 @@
       <div class="stat"><b>10&times;</b><span>more cost-effective than centralized high-end sensing</span></div>
       <div class="stat"><b>360&deg; / 1 Hz</b><span>full-sky scan, day &amp; night, per node</span></div>
       <div class="stat"><b>kbit/s</b><span>3D tracks instead of video — thin links are enough</span></div>
-      <div class="stat"><b>1 operator</b><span>human on the loop — machines do the watching</span></div>
+      <div class="stat"><b>1 operator</b><span>human in the loop — machines do the watching</span></div>
+      <div class="stat"><b>100&ndash;300&nbsp;m</b><span>demo standoff &middot; 1000&nbsp;m in production</span></div>
     </div>
   </div>
 </section>
@@ -296,7 +295,7 @@
         </div>
       </div>
       <h3>SCANS 360&deg; EVERY SECOND</h3>
-      <p>A rotating optical head sweeps the whole sky once per second — nothing enters unseen, out to km range.</p>
+      <p>A rotating optical head sweeps the whole sky once per second — nothing enters unseen. Range: 100&ndash;300&nbsp;m demo, 1000&nbsp;m in production.</p>
     </div>
     <div class="card rv">
       <div class="num">02</div>
@@ -513,16 +512,14 @@
         nothing that betrays your position.</p>
       <div class="chips">
         <div class="chip"><b>LOW DATA_</b><span>kilobits, not gigabytes — works over contested, thin battlefield links</span></div>
-        <div class="chip teal"><b>HUMAN ON THE LOOP_</b><span>one operator supervises; every engagement decision stays human</span></div>
+        <div class="chip teal"><b>HUMAN IN THE LOOP_</b><span>one operator supervises; every engagement decision stays human</span></div>
         <div class="chip"><b>LEARNS EVERY MISSION_</b><span>rapid in-field retraining — new threat today, updated model tomorrow</span></div>
       </div>
     </div>
   </div>
 
   <div class="recon rv">
-    <video src="assets/recon-world.mp4" autoplay muted loop playsinline></video>
-    <img class="print-alt" src="assets/recon-world.jpg" alt="3D reconstructed terrain">
-    <div class="tracker"></div>
+    <div class="recon-soon">coming soon</div>
     <div class="tag">RECONSTRUCTED WORLD_ REAL OUTPUT</div>
     <div class="cap"><b>Actual 3D reconstruction:</b> terrain rebuilt from imagery, with the full flight path of a tracked flyer — every pose, in world coordinates. The same world model tracks UAVs and guides autonomous systems.</div>
   </div>
@@ -622,32 +619,6 @@
 
 /* ---------- restyle placeholder loops: slower + tinted (see CSS) ---------- */
 document.querySelectorAll('video.tint-amber, video.tint-teal').forEach(v=>{v.playbackRate=0.7});
-
-/* ---------- recon-world tracker: holds centre, then eases up to the top + slightly right ---------- */
-(function(){
-  const rec=document.querySelector('.recon video'), trk=document.querySelector('.tracker');
-  if(!rec||!trk) return;
-  const startX=50, startY=50;     // centred in the frame
-  const endX=55.5, endY=13;       // ~10% of centre to the right, near the top
-  const hold=0.40;                // fraction of the clip held in the middle first
-  const ease=t=>t*t*(3-2*t);      // smoothstep for a slow, gentle move
-  let px=null, py=null;
-  function step(){
-    const dur=rec.duration||11, t=rec.currentTime||0, p=Math.min(1,t/dur);
-    const f = p>hold ? ease((p-hold)/(1-hold)) : 0;
-    const tx=startX+(endX-startX)*f, ty=startY+(endY-startY)*f;
-    if(px===null){px=tx;py=ty;}
-    px += (tx-px)*0.12;                       // smooth tracking lag
-    py += (ty-py)*0.12;
-    const jx=Math.sin(t*7.3)*0.35+Math.sin(t*13.7)*0.2;  // subtle estimation jitter
-    const jy=Math.cos(t*6.1)*0.3+Math.sin(t*11.3)*0.18;
-    trk.style.left=(px+jx)+'%';
-    trk.style.top =(py+jy)+'%';
-    trk.style.opacity=1;
-    requestAnimationFrame(step);
-  }
-  rec.addEventListener('playing',()=>requestAnimationFrame(step),{once:true});
-})();
 
 /* ---------- reveal on scroll ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.15});
